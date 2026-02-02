@@ -1,6 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
-import { BarChart3, Users, Calendar, TrendingUp } from 'lucide-react';
+import { Users, UserPlus, Building2, Calendar, Clock, FileText } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { BreadcrumbItem, SharedData } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -8,134 +9,157 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '#' },
 ];
 
-export default function AdminDashboard() {
-    const { auth } = usePage<SharedData>().props;
+interface DashboardStats {
+  totalEmployees: number;
+  newJoiners: number;
+  totalDepartments: number;
+  attendanceRate: number;
+  pendingLeave: number;
+  pendingOvertime: number;
+}
 
-    const stats = [
-        {
-            title: 'Total Employees',
-            value: '245',
-            icon: Users,
-            trend: '+12%',
-            trendUp: true,
-        },
-        {
-            title: 'Present Today',
-            value: '198',
-            icon: Calendar,
-            trend: '80%',
-            trendUp: true,
-        },
-        {
-            title: 'Pending Requests',
-            value: '23',
-            icon: BarChart3,
-            trend: '-5%',
-            trendUp: false,
-        },
-        {
-            title: 'Performance',
-            value: '94%',
-            icon: TrendingUp,
-            trend: '+8%',
-            trendUp: true,
-        },
-    ];
+interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  department: { name: string } | null;
+  position: { name: string } | null;
+  created_at: string;
+}
+
+interface DepartmentDistribution {
+  name: string;
+  count: number;
+}
+
+interface PageProps extends SharedData {
+  stats: DashboardStats;
+  recentEmployees: Employee[];
+  departmentDistribution: DepartmentDistribution[];
+}
+
+export default function AdminDashboard() {
+    const { auth, stats, recentEmployees, departmentDistribution } = usePage<PageProps>().props;
 
     return (
         <AdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
 
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                {/* Welcome Section */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        Welcome back, {auth.user.name}!
-                    </h1>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
-                        Here's what's happening with your organization today.
-                    </p>
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p className="text-muted-foreground">Welcome back! Here's your overview.</p>
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {stats.map((stat) => (
-                        <div
-                            key={stat.title}
-                            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="rounded-lg bg-primary/10 p-3">
-                                        <stat.icon className="size-6 text-primary" />
-                                    </div>
-                                </div>
-                                <span
-                                    className={`text-sm font-medium ${
-                                        stat.trendUp
-                                            ? 'text-green-600 dark:text-green-400'
-                                            : 'text-red-600 dark:text-red-400'
-                                    }`}
-                                >
-                                    {stat.trend}
-                                </span>
-                            </div>
-                            <div className="mt-4">
-                                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    {stat.title}
-                                </h3>
-                                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
-                                    {stat.value}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.totalEmployees}</div>
+                            <p className="text-xs text-muted-foreground">Active employees</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">New Joiners</CardTitle>
+                            <UserPlus className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.newJoiners}</div>
+                            <p className="text-xs text-muted-foreground">This month</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Departments</CardTitle>
+                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.totalDepartments}</div>
+                            <p className="text-xs text-muted-foreground">Total departments</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.attendanceRate}%</div>
+                            <p className="text-xs text-muted-foreground">Today's attendance</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Pending Leave</CardTitle>
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.pendingLeave}</div>
+                            <p className="text-xs text-muted-foreground">Awaiting approval</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Pending Overtime</CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.pendingOvertime}</div>
+                            <p className="text-xs text-muted-foreground">Awaiting approval</p>
+                        </CardContent>
+                    </Card>
                 </div>
 
-                {/* Recent Activity */}
-                <div className="mt-8 grid gap-6 lg:grid-cols-2">
-                    {/* Recent Requests */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Recent Requests
-                        </h2>
-                        <div className="mt-4 space-y-3">
-                            {[1, 2, 3].map((i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center justify-between border-b border-gray-200 pb-3 last:border-0 dark:border-gray-800"
-                                >
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            Leave Request #{i}
-                                        </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            John Doe - 2 days ago
-                                        </p>
+                <div className="grid gap-4 md:grid-cols-2">
+                    {/* Recent Employees */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent Employees</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {recentEmployees.map((employee) => (
+                                    <div key={employee.id} className="flex items-center justify-between">
+                                        <div>
+                                            <p className="font-medium">{employee.name}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {employee.department?.name || 'No Department'} • {employee.position?.name || 'No Position'}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                        Pending
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    {/* Quick Actions */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Quick Actions
-                        </h2>
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                            {[
-                                'Add Employee',
-                                'Mark Attendance',
-                                'Generate Report',
-                                'View Calendar',
-                            ].map((action) => (
-                                <button
-                                    key={action}
-                                    className="rounded-lg border border-gray-200 p-3 text-center text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:text-gray-100 dark:hover:bg-gray-800"
+                    {/* Department Distribution */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Department Distribution</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {departmentDistribution.map((dept, index) => (
+                                    <div key={index} className="flex items-center justify-between">
+                                        <span className="text-sm font-medium">{dept.name}</span>
+                                        <span className="text-sm text-muted-foreground">{dept.count} employees</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
                                 >
                                     {action}
                                 </button>

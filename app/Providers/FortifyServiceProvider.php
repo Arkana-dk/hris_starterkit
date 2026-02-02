@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -21,6 +22,32 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Custom login redirect based on user role
+        $this->app->singleton(LoginResponseContract::class, function () {
+            return new class implements LoginResponseContract {
+                public function toResponse($request)
+                {
+                    $user = auth()->user();
+
+                    // Role-based redirect setelah login
+                    if ($user->hasRole('super-admin')) {
+                        return redirect()->intended('/superadmin/dashboard');
+                    }
+
+                    if ($user->hasAnyRole(['system-admin', 'hr-staff', 'payroll-staff'])) {
+                        return redirect()->intended('/admin/dashboard');
+                    }
+
+                    if ($user->hasRole('employee')) {
+                        return redirect()->intended('/employee/dashboard');
+                    }
+
+                    // Fallback
+                    return redirect()->intended('/');
+                }
+            };
+        });
+
         // Custom logout redirect to login page
         $this->app->singleton(LogoutResponseContract::class, function () {
             return new class implements LogoutResponseContract {
