@@ -34,7 +34,8 @@ class FortifyServiceProvider extends ServiceProvider
                         return redirect()->intended('/superadmin/dashboard');
                     }
 
-                    if ($user->hasAnyRole(['system-admin', 'hr-staff', 'payroll-staff'])) {
+                    // Support both old and new role names
+                    if ($user->hasAnyRole(['system-admin', 'hr-staff', 'payroll-staff', 'hr-admin', 'payroll-admin'])) {
                         return redirect()->intended('/admin/dashboard');
                     }
 

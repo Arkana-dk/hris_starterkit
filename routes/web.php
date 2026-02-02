@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Superadmin\DashboardController as SuperadminDashboardController;
+use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -17,7 +18,8 @@ Route::get('dashboard', function () {
         return redirect()->route('superadmin.dashboard');
     }
     
-    if ($user->hasAnyRole(['system-admin', 'hr-staff', 'payroll-staff'])) {
+    // Support both old and new role names
+    if ($user->hasAnyRole(['system-admin', 'hr-staff', 'payroll-staff', 'hr-admin', 'payroll-admin'])) {
         return redirect()->route('admin.dashboard');
     }
     
@@ -47,7 +49,7 @@ Route::prefix('superadmin')
 // ADMIN ROUTES (system-admin, hr-staff, payroll-staff)
 // ==================================================
 Route::prefix('admin')
-    ->middleware(['auth', 'role:system-admin|hr-staff|payroll-staff'])
+    ->middleware(['auth', 'role:system-admin|hr-staff|payroll-staff|hr-admin|payroll-admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -64,9 +66,7 @@ Route::prefix('employee')
     ->middleware(['auth', 'role:employee'])
     ->name('employee.')
     ->group(function () {
-        Route::get('dashboard', function () {
-            return inertia('employee/dashboard');
-        })->name('dashboard');
+        Route::get('dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
     });
 
 require __DIR__.'/settings.php';
