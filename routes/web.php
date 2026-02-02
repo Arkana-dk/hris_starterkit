@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Superadmin\DashboardController as SuperadminDashboardController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
+use App\Http\Controllers\HR\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -46,15 +47,26 @@ Route::prefix('superadmin')
     });
 
 // ==================================================
-// ADMIN ROUTES (system-admin, hr-staff, payroll-staff)
+// ADMIN ROUTES (super-admin, system-admin, hr-staff, payroll-staff)
+// Super-admin can access all admin features
 // ==================================================
 Route::prefix('admin')
-    ->middleware(['auth', 'role:system-admin|hr-staff|payroll-staff|hr-admin|payroll-admin'])
+    ->middleware(['auth', 'role:super-admin|system-admin|hr-staff|payroll-staff|hr-admin|payroll-admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         
-        // HR Module - akan diisi nanti
+        // HR Module - Employee Management
+        Route::prefix('hr')->name('hr.')->group(function () {
+            // Employee CRUD
+            Route::resource('employee', EmployeeController::class);
+            
+            // Employee Import/Export
+            Route::get('employee-export', [EmployeeController::class, 'export'])->name('employee.export');
+            Route::post('employee-import', [EmployeeController::class, 'import'])->name('employee.import');
+            Route::get('employee-template', [EmployeeController::class, 'downloadTemplate'])->name('employee.template');
+        });
+        
         // Payroll Module - akan diisi nanti
         // Attendance Module - akan diisi nanti
     });

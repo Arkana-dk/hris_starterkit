@@ -2,6 +2,8 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { SuperAdminSidebar } from '@/components/superadmin/superadmin-sidebar';
 import { SuperAdminHeader } from '@/components/superadmin/superadmin-header';
 import type { BreadcrumbItem } from '@/types';
+import { usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 
 type Props = {
     children: React.ReactNode;
@@ -12,8 +14,10 @@ export default function SuperAdminSidebarLayout({
     children,
     breadcrumbs = [],
 }: Props) {
+    const isOpen = usePage<SharedData>().props.sidebarOpen;
+
     return (
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={isOpen}>
             <SuperAdminSidebar />
             <SidebarInset>
                 <SuperAdminHeader breadcrumbs={breadcrumbs} />

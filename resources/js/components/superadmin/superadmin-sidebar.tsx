@@ -94,20 +94,20 @@ const superAdminNavGroups: NavGroup[] = [
                         isLabel: true,
                     },
                     {
-                        title: 'Data Pegawai',
-                        href: '/superadmin/admin/hr/data-pegawai',
+                        title: 'Employee Management',
+                        href: '/admin/hr/employee',
                     },
                     {
                         title: 'Department',
-                        href: '/superadmin/admin/hr/department',
-                    },
-                    {
-                        title: 'Group',
-                        href: '/superadmin/admin/hr/group',
+                        href: '/admin/hr/department',
                     },
                     {
                         title: 'Section',
-                        href: '/superadmin/admin/hr/section',
+                        href: '/admin/hr/section',
+                    },
+                    {
+                        title: 'Group',
+                        href: '/admin/hr/group',
                     },
                     // PRESENSI & PENGAJUAN
                     {
@@ -204,7 +204,7 @@ const superAdminNavGroups: NavGroup[] = [
 
 export function SuperAdminSidebar() {
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

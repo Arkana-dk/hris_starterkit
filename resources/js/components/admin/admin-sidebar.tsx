@@ -182,7 +182,7 @@ const adminNavGroups: NavGroup[] = [
 
 export function AdminSidebar() {
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
