@@ -95,19 +95,19 @@ const superAdminNavGroups: NavGroup[] = [
                     },
                     {
                         title: 'Employee Management',
-                        href: '/admin/hr/employee',
+                        href: '/superadmin/hr/employee',
                     },
                     {
                         title: 'Department',
-                        href: '/admin/hr/department',
+                        href: '/superadmin/hr/department',
                     },
                     {
                         title: 'Section',
-                        href: '/admin/hr/section',
+                        href: '/superadmin/hr/section',
                     },
                     {
                         title: 'Group',
-                        href: '/admin/hr/group',
+                        href: '/superadmin/hr/group',
                     },
                     // PRESENSI & PENGAJUAN
                     {

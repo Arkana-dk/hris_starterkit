@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\HR;
+namespace App\Http\Controllers\Superadmin\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
@@ -13,7 +13,6 @@ use App\Exports\EmployeesExport;
 use App\Imports\EmployeesImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -72,7 +71,7 @@ class EmployeeController extends Controller
         $departments = Department::select('id', 'name')->orderBy('name')->get();
         $positions = Position::select('id', 'name')->orderBy('name')->get();
 
-        return Inertia::render('hr/employee/index', [
+        return Inertia::render('superadmin/hr/employee/index', [
             'employees' => $employees,
             'filters' => $request->only(['search', 'department_id', 'position_id', 'status']),
             'departments' => $departments,
@@ -91,7 +90,7 @@ class EmployeeController extends Controller
         $groups = Group::select('id', 'name', 'code')->orderBy('name')->get();
         $payGroups = PayGroup::select('id', 'name', 'code')->orderBy('name')->get();
 
-        return Inertia::render('hr/employee/create', [
+        return Inertia::render('superadmin/hr/employee/create', [
             'departments' => $departments,
             'sections' => $sections,
             'positions' => $positions,
@@ -142,7 +141,7 @@ class EmployeeController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.hr.employee.index')
+                ->route('superadmin.hr.employee.index')
                 ->with('success', 'Employee created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -167,7 +166,7 @@ class EmployeeController extends Controller
             'user',
         ]);
 
-        return Inertia::render('hr/employee/show', [
+        return Inertia::render('superadmin/hr/employee/show', [
             'employee' => $employee,
         ]);
     }
@@ -185,7 +184,7 @@ class EmployeeController extends Controller
         $groups = Group::select('id', 'name', 'code')->orderBy('name')->get();
         $payGroups = PayGroup::select('id', 'name', 'code')->orderBy('name')->get();
 
-        return Inertia::render('hr/employee/edit', [
+        return Inertia::render('superadmin/hr/employee/edit', [
             'employee' => $employee,
             'departments' => $departments,
             'sections' => $sections,
@@ -201,33 +200,32 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $validated = $request->validate([
-            'nik' => ['required', 'string', 'max:50', Rule::unique('employees')->ignore($employee->id)],
+            'employee_number' => ['required', 'string', 'max:50', Rule::unique('employees')->ignore($employee->id)],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('employees')->ignore($employee->id)],
             'phone' => ['nullable', 'string', 'max:20'],
-            'id_card' => ['nullable', 'string', 'max:50'],
-            'birth_place' => ['nullable', 'string', 'max:100'],
-            'birth_date' => ['nullable', 'date'],
+            'national_identity_number' => ['nullable', 'string', 'max:50'],
+            'family_number_card' => ['nullable', 'string', 'max:50'],
+            'place_of_birth' => ['nullable', 'string', 'max:100'],
+            'date_of_birth' => ['nullable', 'date'],
             'gender' => ['nullable', 'in:male,female'],
             'religion' => ['nullable', 'string', 'max:50'],
             'marital_status' => ['nullable', 'in:single,married,divorced,widowed'],
+            'dependents_count' => ['nullable', 'integer', 'min:0'],
             'address' => ['nullable', 'string'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'postal_code' => ['nullable', 'string', 'max:10'],
             'department_id' => ['required', 'exists:departments,id'],
             'section_id' => ['nullable', 'exists:sections,id'],
             'position_id' => ['required', 'exists:positions,id'],
             'group_id' => ['nullable', 'exists:groups,id'],
             'pay_group_id' => ['nullable', 'exists:pay_groups,id'],
-            'employment_type' => ['nullable', 'in:permanent,contract,probation,internship'],
             'tmt' => ['nullable', 'date'],
+            'contract_end_date' => ['nullable', 'date'],
             'status' => ['required', 'in:active,inactive,suspended,resigned'],
+            'salary' => ['nullable', 'numeric', 'min:0'],
             'bank_name' => ['nullable', 'string', 'max:100'],
-            'bank_account' => ['nullable', 'string', 'max:50'],
-            'bank_holder' => ['nullable', 'string', 'max:255'],
-            'tax_number' => ['nullable', 'string', 'max:50'],
-            'bpjs_kesehatan' => ['nullable', 'string', 'max:50'],
-            'bpjs_ketenagakerjaan' => ['nullable', 'string', 'max:50'],
+            'bank_account_number' => ['nullable', 'string', 'max:50'],
+            'bank_account_name' => ['nullable', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:10'],
         ]);
 
         try {
@@ -238,7 +236,7 @@ class EmployeeController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('hr.employee.index')
+                ->route('superadmin.hr.employee.index')
                 ->with('success', 'Employee updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -257,13 +255,12 @@ class EmployeeController extends Controller
         try {
             DB::beginTransaction();
 
-            // Soft delete if your model uses SoftDeletes, otherwise hard delete
             $employee->delete();
 
             DB::commit();
 
             return redirect()
-                ->route('hr.employee.index')
+                ->route('superadmin.hr.employee.index')
                 ->with('success', 'Employee deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -287,7 +284,7 @@ class EmployeeController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'], // 5MB max
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
         ]);
 
         try {
@@ -299,7 +296,7 @@ class EmployeeController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('admin.hr.employee.index')
+                ->route('superadmin.hr.employee.index')
                 ->with('success', 'Employees imported successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -315,33 +312,32 @@ class EmployeeController extends Controller
     public function downloadTemplate()
     {
         $headers = [
-            'NIK',
+            'Employee Number',
             'Name',
             'Email',
             'Phone',
-            'ID Card',
-            'Birth Place',
-            'Birth Date',
+            'National Identity Number',
+            'Family Number Card',
+            'Place of Birth',
+            'Date of Birth',
             'Gender',
             'Religion',
             'Marital Status',
+            'Dependents Count',
             'Address',
-            'City',
-            'Postal Code',
-            'Department',
-            'Section',
-            'Position',
-            'Group',
-            'Pay Group',
-            'Employment Type',
+            'Department ID',
+            'Section ID',
+            'Position ID',
+            'Group ID',
+            'Pay Group ID',
             'TMT',
+            'Contract End Date',
             'Status',
+            'Salary',
             'Bank Name',
-            'Bank Account',
-            'Bank Holder',
-            'Tax Number',
-            'BPJS Kesehatan',
-            'BPJS Ketenagakerjaan',
+            'Bank Account Number',
+            'Bank Account Name',
+            'Title',
         ];
 
         $callback = function() use ($headers) {

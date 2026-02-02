@@ -7,8 +7,8 @@ import {
     Clock,
     FileText,
 } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AdminLayout from '@/layouts/admin-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,7 +46,7 @@ interface PageProps extends SharedData {
 }
 
 export default function AdminDashboard() {
-    const { auth, stats, recentEmployees, departmentDistribution } =
+    const { stats, recentEmployees, departmentDistribution } =
         usePage<PageProps>().props;
 
     return (

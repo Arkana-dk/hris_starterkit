@@ -4,12 +4,21 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Superadmin\DashboardController as SuperadminDashboardController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use App\Http\Controllers\HR\EmployeeController;
+use App\Http\Controllers\Superadmin\HR\EmployeeController as SuperadminEmployeeController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// Logout route (GET method for convenience)
+Route::get('logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+})->name('logout.get');
 
 // Generic dashboard - redirects based on role (handled by FortifyServiceProvider)
 Route::get('dashboard', function () {
@@ -44,6 +53,16 @@ Route::prefix('superadmin')
         Route::get('user-roles', function () {
             return inertia('superadmin/user-roles');
         })->name('user-roles');
+        
+        // HR Module - Employee Management
+        Route::prefix('hr')->name('hr.')->group(function () {
+            Route::resource('employee', SuperadminEmployeeController::class);
+            
+            // Employee Import/Export
+            Route::get('employee-export', [SuperadminEmployeeController::class, 'export'])->name('employee.export');
+            Route::post('employee-import', [SuperadminEmployeeController::class, 'import'])->name('employee.import');
+            Route::get('employee-template', [SuperadminEmployeeController::class, 'downloadTemplate'])->name('employee.template');
+        });
     });
 
 // ==================================================
@@ -82,3 +101,4 @@ Route::prefix('employee')
     });
 
 require __DIR__.'/settings.php';
+

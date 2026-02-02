@@ -1,7 +1,6 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { AdminHeader } from '@/components/admin/admin-header';
 import type { AppLayoutProps } from '@/types';
 
 export default function AdminSidebarLayout({
@@ -9,12 +8,12 @@ export default function AdminSidebarLayout({
     breadcrumbs = [],
 }: AppLayoutProps) {
     return (
-        <AppShell variant="sidebar">
+        <SidebarProvider>
             <AdminSidebar />
-            <AppContent variant="sidebar" className="overflow-x-hidden">
-                <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
-            </AppContent>
-        </AppShell>
+            <SidebarInset>
+                <AdminHeader breadcrumbs={breadcrumbs} />
+                <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }

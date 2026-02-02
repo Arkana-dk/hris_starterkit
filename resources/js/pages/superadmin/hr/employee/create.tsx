@@ -1,7 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
+import SuperAdminLayout from '@/layouts/superadmin/superadmin-sidebar-layout';
 import {
     Card,
     CardContent,
@@ -21,12 +21,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import admin from '@/routes/admin';
+import superadmin from '@/routes/superadmin';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin', href: '/admin/dashboard' },
+    { title: 'Superadmin', href: '/superadmin/dashboard' },
     { title: 'HR', href: '#' },
-    { title: 'Employees', href: admin.hr.employee.index.url() },
+    { title: 'Employees', href: '/superadmin/hr/employee' },
     { title: 'Create', href: '#' },
 ];
 
@@ -110,11 +110,11 @@ export default function EmployeeCreate() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(admin.hr.employee.store.url());
+        post(superadmin.hr.employee.store.url());
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <SuperAdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Employee" />
 
             <div className="space-y-6">
@@ -688,6 +688,6 @@ export default function EmployeeCreate() {
                     </div>
                 </form>
             </div>
-        </AdminLayout>
+        </SuperAdminLayout>
     );
 }

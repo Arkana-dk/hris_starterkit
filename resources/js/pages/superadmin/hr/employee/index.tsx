@@ -12,7 +12,7 @@ import {
     Eye,
     Filter,
 } from 'lucide-react';
-import AdminLayout from '@/layouts/admin-layout';
+import SuperAdminLayout from '@/layouts/superadmin/superadmin-sidebar-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,10 +41,10 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import type { BreadcrumbItem, SharedData, PaginatedData } from '@/types';
-import admin from '@/routes/admin';
+import superadmin from '@/routes/superadmin';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin', href: '/admin/dashboard' },
+    { title: 'Superadmin', href: '/superadmin/dashboard' },
     { title: 'HR', href: '#' },
     { title: 'Employees', href: '#' },
 ];
@@ -107,7 +107,7 @@ export default function EmployeeIndex() {
 
     const handleSearch = () => {
         router.get(
-            admin.hr.employee.index.url(),
+            supersuperadmin.hr.employee.index.url(),
             {
                 search,
                 department_id: departmentId,
@@ -123,14 +123,14 @@ export default function EmployeeIndex() {
         setDepartmentId('');
         setPositionId('');
         setStatusFilter('');
-        router.get(admin.hr.employee.index.url());
+        router.get(superadmin.hr.employee.index.url());
     };
 
     const handleDelete = () => {
         if (!deleteDialog.employee) return;
 
         router.delete(
-            admin.hr.employee.destroy.url({
+            superadmin.hr.employee.destroy.url({
                 employee: deleteDialog.employee.id,
             }),
             {
@@ -141,7 +141,7 @@ export default function EmployeeIndex() {
     };
 
     const handleExport = () => {
-        window.location.href = admin.hr.employee.export.url();
+        window.location.href = superadmin.hr.employee.export.url();
     };
 
     const handleImport = () => {
@@ -150,7 +150,7 @@ export default function EmployeeIndex() {
         const formData = new FormData();
         formData.append('file', importFile);
 
-        router.post(admin.hr.employee.import.url(), formData, {
+        router.post(superadmin.hr.employee.import.url(), formData, {
             onSuccess: () => {
                 setImportDialog(false);
                 setImportFile(null);
@@ -159,7 +159,7 @@ export default function EmployeeIndex() {
     };
 
     const handleDownloadTemplate = () => {
-        window.location.href = admin.hr.employee.template.url();
+        window.location.href = superadmin.hr.employee.template.url();
     };
 
     const getStatusBadge = (status: string) => {
@@ -176,7 +176,7 @@ export default function EmployeeIndex() {
     };
 
     return (
-        <AdminLayout breadcrumbs={breadcrumbs}>
+        <SuperAdminLayout breadcrumbs={breadcrumbs}>
             <Head title="Employee Management" />
 
             <div className="space-y-6">
@@ -201,7 +201,7 @@ export default function EmployeeIndex() {
                             <Download className="mr-2 h-4 w-4" />
                             Export
                         </Button>
-                        <Link href={admin.hr.employee.create.url()}>
+                        <Link href={supersuperadmin.hr.employee.create.url()}>
                             <Button>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Employee
@@ -374,7 +374,7 @@ export default function EmployeeIndex() {
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
                                                     <Link
-                                                        href={admin.hr.employee.show.url(
+                                                        href={superadmin.hr.employee.show.url(
                                                             {
                                                                 employee:
                                                                     employee.id,
@@ -389,7 +389,7 @@ export default function EmployeeIndex() {
                                                         </Button>
                                                     </Link>
                                                     <Link
-                                                        href={admin.hr.employee.edit.url(
+                                                        href={superadmin.hr.employee.edit.url(
                                                             {
                                                                 employee:
                                                                     employee.id,
@@ -528,6 +528,6 @@ export default function EmployeeIndex() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </SuperAdminLayout>
     );
 }
